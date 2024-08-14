@@ -6,28 +6,56 @@ if(isset($_GET['id'])){
             $$k = $v;
         }
     }
-$review = $conn->query("SELECT r.*,concat(firstname,' ',lastname) as name FROM `rate_review` r inner join users u on r.user_id = u.id where r.package_id='{$id}' order by unix_timestamp(r.date_created) desc ");
-$review_count =$review->num_rows;
-$rate = 0;
-$feed = array();
-while($row= $review->fetch_assoc()){
-    $rate += $row['rate'];
-    if(!empty($row['review'])){
-        $row['review'] = stripslashes(html_entity_decode($row['review']));
-        $feed[] = $row;
+    $review = $conn->query("SELECT r.*,concat(firstname,' ',lastname) as name FROM `rate_review` r inner join users u on r.user_id = u.id where r.package_id='{$id}' order by unix_timestamp(r.date_created) desc ");
+    $review_count =$review->num_rows;
+    $rate = 0;
+    $feed = array();
+    while($row= $review->fetch_assoc()){
+        $rate += $row['rate'];
+        if(!empty($row['review'])){
+            $row['review'] = stripslashes(html_entity_decode($row['review']));
+            $feed[] = $row;
+        }
     }
-}
-if($rate > 0 && $review_count > 0)
-$rate = number_format($rate/$review_count,0,"");
-$files = array();
-if(is_dir(base_app.'uploads/package_'.$id)){
-    $ofile = scandir(base_app.'uploads/package_'.$id);
-    foreach($ofile as $img){
-        if(in_array($img,array('.','..')))
-        continue;
-        $files[] = validate_image('uploads/package_'.$id.'/'.$img);
+    if($rate > 0 && $review_count > 0)
+        $rate = number_format($rate/$review_count,0,"");
+    $files = array();
+    if(is_dir(base_app.'uploads/package_'.$id)){
+        $ofile = scandir(base_app.'uploads/package_'.$id);
+        foreach($ofile as $img){
+            if(in_array($img,array('.','..')))
+                continue;
+            $files[] = validate_image('uploads/package_'.$id.'/'.$img);
+        }
     }
-}
+    $status = 1;
+    $bookings = $conn->query("SELECT * FROM `book_list` WHERE md5(package_id)='{$_GET['id']}' AND status != 2");
+    $current_date = date("Y-m-d");
+    $valid_bookings = 0;
+    
+    // Debugging: Check if the query runs successfully
+    if (!$bookings) {
+        die("Error in bookings query: " . $conn->error);
+    }
+    
+    while ($row = $bookings->fetch_assoc()) {
+        print_r($row);
+        if ($row['schedule'] >= $current_date) {
+            $valid_bookings++;
+        }
+    }
+    
+    if ($valid_bookings >= $booking_limit) {
+        $status = 0;
+    }
+    
+    // Debugging: Check other queries
+    $packages = $conn->query("SELECT * FROM `packages` WHERE md5(id)='{$_GET['id']}'");
+    if (!$packages) {
+        die("Error in packages query: " . $conn->error);
+    }
+
+    
 }
 ?>
 <section class="page-section">
@@ -66,7 +94,9 @@ if(is_dir(base_app.'uploads/package_'.$id)){
                     <hr>
                     <div class="w-100 d-flex justify-content-between">
                         <?php if ($status == 1): ?>
-                            <button class="btn btn-flat btn-warning" type="button" id="book">Book Now</button>
+                            <button class="btn btn-flat btn-warning" type="button" id="book"> Book  </button>
+                        <?php else: ?>
+                            <button class="btn btn-flat btn-danger" type="button" disabled> Booking limit already reached </button>
                         <?php endif; ?>
                     </div>
                 </div>
