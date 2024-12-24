@@ -392,10 +392,10 @@ class Master extends DBConnection
 							$user_row = $user_result->fetch_assoc();
 							$email = $user_row['username'];
 
-							// Send the email
-							$status_text = $status === 1 ? "Approved" : ($status === 0 ? "Pending" : "Rejected");
-							$message = "Your booking has been updated to: $status_text.";
-
+							$status = (int)$status; // Explicitly cast $status to integer
+							$status_text = $status === 1 ? "Confirmed" : ($status === 0 ? "Pending" : ($status === 2 ? "Cancelled" : "Unknown"));
+							$message = "Your booking status has been updated to: $status_text.";
+							
 							$email_resp = $this->sendEmail($email, $message);
 
 							if ($email_resp['status'] === 'success') {
