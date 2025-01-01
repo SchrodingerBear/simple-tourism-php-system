@@ -198,8 +198,8 @@ class Master extends DBConnection
 			$mail->isSMTP();
 			$mail->Host = 'smtp.gmail.com';
 			$mail->SMTPAuth = true;
-			$mail->Username = 'pnpsectortacloban@gmail.com';
-			$mail->Password = 'uwnf blmx umez eyiw'; // Replace with App Password
+			$mail->Username = 'seancvpugosa@gmail.com';
+			$mail->Password = 'cyow ivck ffdk etea'; // Replace with App Password
 			$mail->SMTPSecure = 'tls';
 			$mail->Port = 587;
 
@@ -213,7 +213,7 @@ class Master extends DBConnection
 			];
 
 			// Recipients
-			$mail->setFrom('pnpsectortacloban@gmail.com', 'Human Explore Travel and Tours');
+			$mail->setFrom('seancvpugosa@gmail.com', 'Human Explore Travel and Tours');
 			$mail->addAddress($to);
 
 			// Content

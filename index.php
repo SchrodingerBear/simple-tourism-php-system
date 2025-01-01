@@ -7,9 +7,9 @@ if ($_SERVER['REQUEST_METHOD'] == 'POST' && isset($_POST['verify_otp'])) {
   } else {
     echo 'fail';
   }
+
   exit;
 }
-
 ?>
 
 <!DOCTYPE html>
